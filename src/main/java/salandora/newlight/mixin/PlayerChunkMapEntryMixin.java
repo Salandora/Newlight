@@ -16,7 +16,6 @@ import salandora.newlight.lighting.LightTrackingHooks;
 import salandora.newlight.util.IPlayerChunkMapEntry;
 
 import java.util.Iterator;
-import java.util.List;
 import java.util.Map;
 
 @Mixin(PlayerChunkMapEntry.class)
@@ -24,7 +23,6 @@ public class PlayerChunkMapEntryMixin implements IPlayerChunkMapEntry
 {
     @Shadow @Final private PlayerChunkMap playerChunkMap;
 
-    @Shadow @Final private List<EntityPlayerMP> players;
     @Shadow private int changedSectionFilter;
     private java.util.Map<EntityPlayerMP, int[]> lightTrackings = new java.util.HashMap<>();
     private final java.util.Map<EntityPlayerMP, int[]> neighborLightTrackings = new java.util.HashMap<>();
