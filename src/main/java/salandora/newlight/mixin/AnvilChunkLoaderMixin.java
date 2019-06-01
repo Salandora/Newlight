@@ -1,10 +1,7 @@
 package salandora.newlight.mixin;
 
-import net.minecraft.nbt.NBTTagList;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.biome.Biome;
-import net.minecraft.world.chunk.ChunkPrimerTickList;
-import net.minecraft.world.chunk.UpgradeData;
+import net.minecraft.world.chunk.ChunkSection;
+import org.spongepowered.asm.mixin.injection.Redirect;
 import salandora.newlight.lighting.LightingHooks;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.world.IWorld;
@@ -16,11 +13,12 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
-import org.spongepowered.asm.mixin.injection.callback.LocalCapture;
 
 @Mixin(AnvilChunkLoader.class)
 public class AnvilChunkLoaderMixin
 {
+    private NBTTagCompound readChunkFromNBT_compound;
+
     @Inject(method = "writeChunkToNBT",
             at = @At(value = "INVOKE",
                     target = "Lnet/minecraft/nbt/NBTTagCompound;put(Ljava/lang/String;Lnet/minecraft/nbt/INBTBase;)V",
@@ -30,13 +28,18 @@ public class AnvilChunkLoaderMixin
         LightingHooks.writeLightData(chunkIn, compound);
     }
 
-    @Inject(method = "readChunkFromNBT",
+    @Inject(method = "readChunkFromNBT", at = @At("HEAD"))
+    private void readChunkFromNBT_storeCompound(IWorld worldIn, NBTTagCompound compound, CallbackInfoReturnable<Chunk> cir)
+    {
+        this.readChunkFromNBT_compound = compound;
+    }
+
+    @Redirect(method = "readChunkFromNBT",
             at = @At(value = "INVOKE",
-                    target = "Lnet/minecraft/world/chunk/Chunk;setSections([Lnet/minecraft/world/chunk/ChunkSection;)V",
-                    shift = At.Shift.AFTER),
-            locals = LocalCapture.CAPTURE_FAILHARD)
-    private void readLightData(IWorld worldIn, NBTTagCompound compound, CallbackInfoReturnable<Chunk> cir,
-                               int i, int j, Biome abiome[], BlockPos.MutableBlockPos blockpos$mutableblockpos, UpgradeData upgradedata, ChunkPrimerTickList chunkprimerticklist1, ChunkPrimerTickList chunkprimerticklist, long l, Chunk chunk, NBTTagList nbttaglist) {
-        LightingHooks.readLightData(chunk, compound);
+                    target = "Lnet/minecraft/world/chunk/Chunk;setSections([Lnet/minecraft/world/chunk/ChunkSection;)V"))
+    private void readLightData(Chunk chunk, ChunkSection[] sections) {
+        chunk.setSections(sections);
+
+        LightingHooks.readLightData(chunk, this.readChunkFromNBT_compound);
     }
 }
