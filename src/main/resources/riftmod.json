@@ -1,0 +1,10 @@
+{
+    "id": "newLight",
+    "name": "Rift NewLight",
+    "authors": [
+        "Salandora"
+    ],
+    "listeners": [
+        "salandora.newlight.NewLight"
+    ]
+}

@@ -1,0 +1,69 @@
+buildscript {
+	repositories {
+		mavenLocal()
+		mavenCentral()
+		maven { url 'https://www.jitpack.io' }
+		maven { url 'http://repo.spongepowered.org/maven' }
+		maven { url 'https://files.minecraftforge.net/maven' }
+	}
+	dependencies {
+		//Change jitpack to moderniser when Forge uploads 1.13.2 MCPConfig
+		classpath 'com.github.Chocohead:ForgeGradle:jitpack-SNAPSHOT'
+        classpath 'org.spongepowered:mixingradle:0.6-SNAPSHOT'
+	}
+}
+
+apply plugin: 'net.minecraftforge.gradle.tweaker-client'
+apply plugin: 'org.spongepowered.mixin'
+apply plugin: 'java'
+
+sourceCompatibility = 1.8
+targetCompatibility = 1.8
+
+repositories {
+    //mavenLocal()
+	mavenCentral()
+	maven { url 'https://www.jitpack.io' }
+	maven { url 'https://www.dimdev.org/maven/' }
+}
+
+dependencies {
+	implementation 'com.github.Chocohead:Rift:jitpack-SNAPSHOT:dev'
+}
+
+ext.configFile = file "build.properties"
+
+configFile.withReader {
+    def prop = new Properties()
+    prop.load(it)
+    project.ext.config = new ConfigSlurper().parse prop
+}
+
+minecraft {
+	version = config.minecraft_version
+	mappings = config.mappings_version
+	runDir = 'run'
+    makeObfSourceJar = false
+	tweakClass = 'org.dimdev.riftloader.launch.RiftLoaderClientTweaker'
+	
+    ext.mod_version = config.mod_version
+	if (mod_version.endsWith('-dev')) {
+        mod_version = mod_version + "." + new Date().format('yyyyMMdd.HHmmss')
+    }
+	
+}
+
+group  = config.group + "." + config.mod_id
+version project.minecraft.mod_version
+archivesBaseName = config.mod_file_name + "-" + config.minecraft_version
+
+compileJava {
+    sourceCompatibility = 1.8
+    targetCompatibility = 1.8
+    options.encoding = 'UTF-8'
+}
+
+mixin {
+    defaultObfuscationEnv notch
+    add sourceSets.main, 'mixins.' + config.mod_id + '.refmap.json'
+}

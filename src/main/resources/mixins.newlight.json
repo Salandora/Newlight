@@ -1,0 +1,25 @@
+{
+  "required": true,
+  "minVersion": "0.6",
+  "compatibilityLevel": "JAVA_8",
+  "target": "@env(DEFAULT)",
+  "package": "salandora.newlight.mixin",
+  "refmap": "mixins.newlight.refmap.json",
+  "mixins": [
+    "AnvilChunkLoaderMixin",
+    "ChunkMixin",
+    "ChunkProviderServerMixin",
+    "ChunkSectionMixin",
+    "EnumFacingMixin",
+    "PlayerChunkMapEntryMixin",
+    "SPacketChunkDataMixin",
+    "WorldMixin",
+    "WorldServerMixin"
+  ],
+  "client": [
+    "client.ChunkProviderClientMixin",
+    "client.MinecraftMixin",
+    "client.NetHandlerPlayClientMixin",
+    "client.WorldRendererMixin"
+  ]
+}
